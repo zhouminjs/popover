@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <div class="middle" style="height: 800px;overflow: auto;">
-      <div class="inner" style="height: 900px;padding-top: 100px;">
-        <popover trigger="manual" :value="true">
+      <div class="inner" style="height: 900px;padding-top: 100px;padding-left: 200px;">
+        <popover trigger="click" :value="true" >
           <button>按钮</button>
           <div slot='content' >测试一哈子</div>
         </popover>
@@ -17,6 +17,11 @@ export default {
   name: 'App',
   components: {
     popover
+  },
+  data () {
+    return {
+      placement: 'bottom-end'
+    }
   }
 }
 </script>

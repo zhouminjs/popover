@@ -32,7 +32,7 @@ export default {
     content: String,
     placement: {
       type: String,
-      default: "top-start",
+      default: "bottom",
       validator: (value) =>
         [
           "top",
@@ -134,7 +134,7 @@ export default {
       if (
         ["click", "hover"].includes(this.trigger) &&
         !this.$refs.content.contains(target) &&
-        !this.$refs.wrap.contains(target)
+        !this.$refs.wrap.firstChild.contains(target)
       ) {
         this.show = false;
         this.$emit('input', false)
@@ -149,11 +149,9 @@ export default {
       let contentDom = this.$refs.content;
       let width = 0;
       let height = 0;
-      // eslint-disable-next-line vue/valid-next-tick
-      await this.$nextTick(() => {
-        width = contentDom.offsetWidth;
-        height = contentDom.offsetHeight;
-      });
+      await this.$nextTick();
+      width = contentDom.offsetWidth;
+      height = contentDom.offsetHeight;
       let style = {};
       if (clientX + width > this.w) {
         style.left = Number(clientX - width) + "px";
@@ -168,29 +166,58 @@ export default {
       return style;
     },
     async getHoverOrClickStyle() {
-      let { height, top, left } = this.getInnerSize();
+      let { height, top, left, width } = this.getInnerSize();
       let contentDom = this.$refs.content;
       let contentHeight = 0;
+      let contentWidth = 0;
       // let contentWidth = 0
-      // eslint-disable-next-line vue/valid-next-tick
-      await this.$nextTick(() => {
-        // contentWidth = contentDom.offsetWidth
-        contentHeight = contentDom.offsetHeight;
-      });
+      await this.$nextTick();
+      contentHeight = contentDom.offsetHeight
+      contentWidth = contentDom.offsetWidth
       let style = {};
-      // if (left + width > this.w) {
-      //   style.left = Number(left - width) + 'px'
+      style.left = this.getLeft({ height, top, left, width, contentHeight, contentWidth })
+      // if (top + contentHeight + height > this.h) {
+      //   style.bottom = top + "px";
       // } else {
-      //   style.left = clientX + 'px'
+      //   style.top = top + height + "px";
       // }
-      style.left = left + "px";
-      if (top + contentHeight + height > this.h) {
-        style.bottom = top + "px";
-      } else {
-        style.top = top + height + "px";
-      }
       // style.position = "absolute";
+      style.top = this.getTop({ height, top, left, width, contentHeight, contentWidth })
       return style;
+    },
+    getLeft ({ height, top, left, width, contentHeight, contentWidth }) {
+      let leftMap = {
+        'top': Number(left - Math.abs(contentWidth - width) / 2) + 'px',
+        'top-start': left + 'px',
+        'top-end': Number(left + width - contentWidth) + 'px',
+        'bottom': Number(left - Math.abs(contentWidth - width) / 2) + 'px',
+        'bottom-start': left + 'px',
+        'bottom-end': Number(left + width - contentWidth) + 'px',
+        "right": Number(left + width) + 'px',
+        "right-start": Number(left + width) + 'px',
+        "right-end": Number(left + width) + 'px',
+        "left": Number(left - contentWidth) + 'px',
+        "left-start": Number(left - contentWidth) + 'px',
+        "left-end": Number(left - contentWidth) + 'px',
+      }
+      return leftMap[this.placement] || 'initial'
+    },
+    getTop ({ height, top, left, width, contentHeight, contentWidth }) {
+      let topMap = {
+        'bottom': Number(top + height) + 'px',
+        'bottom-end': Number(top + height) + 'px',
+        'bottom-start': Number(top + height) + 'px',
+        "right": Number(top - Math.abs(height - contentHeight) /2 ) + 'px',
+        "right-start": top + 'px',
+        "right-end": Number(top + height - contentHeight) + 'px',
+        'top': Number(top - contentHeight) + 'px',
+        'top-start': Number(top - contentHeight) + 'px',
+        'top-end': Number(top - contentHeight) + 'px',
+        "left":  Number(top - Math.abs(height - contentHeight) /2 ) + 'px',
+        "left-start": top + 'px',
+        "left-end": Number(top + height - contentHeight) + 'px',
+      }
+      return topMap[this.placement] || 'initial'
     },
     // 递归查找离目标元素最近的内容溢出的dom
     getScrollParentDom(dom) {
