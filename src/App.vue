@@ -1,28 +1,34 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <div class="middle" style="height: 800px;overflow: auto;">
+      <div class="inner" style="height: 900px;padding-top: 100px;">
+        <popover trigger="manual" :value="true">
+          <button>按钮</button>
+          <div slot='content' >测试一哈子</div>
+        </popover>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import popover from './components/popover'
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    popover
   }
 }
 </script>
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  height: 700px;
+  overflow: auto;
+}
+body {
+  padding: 0;
+  margin: 0;
 }
 </style>
